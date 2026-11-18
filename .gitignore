@@ -8,3 +8,13 @@ venv/
 .vscode/
 *.log
 .DS_Store
+# MLflow artifacts
+mlruns/
+mlartifacts/
+
+# CatBoost training info
+catboost_info/
+
+# Другие возможные артефакты
+*.pkl
+*.joblib
