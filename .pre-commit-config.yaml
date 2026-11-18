@@ -20,5 +20,10 @@ repos:
     rev: v1.11.2
     hooks:
       - id: mypy
-        additional_dependencies: [types-requests, pandas-stubs]
-        args: [--config-file=pyproject.toml]
+        additional_dependencies:
+          - types-requests
+          - pandas-stubs
+          - "pydantic>=2"
+          - types-pyyaml
+          - pytest
+        args: [ --config-file=pyproject.toml ]

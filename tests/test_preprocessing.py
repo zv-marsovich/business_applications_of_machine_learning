@@ -4,18 +4,14 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.pipeline import Pipeline
-from src.preprocessing import (
-    PowerImputer,
-    PreprocessingConfig,
-    clean_training_data,
-    create_preprocessor,
-    get_columns_types,
-    get_features_target,
-    load_data,
-    prepare_training_dataset,
-    split_data,
-    standardize_categories,
-)
+from src.config import PreprocessingConfig
+from src.data.loader import load_data
+from src.features.cleaning import clean_training_data, standardize_categories
+from src.features.pipeline import create_preprocessor
+from src.features.schema import get_columns_types, get_features_target
+from src.features.split import split_data
+from src.features.transformers import PowerImputer
+from src.pipeline.prepare import prepare_training_dataset
 
 
 def test_load_data(tmp_path: Path) -> None:

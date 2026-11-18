@@ -1,0 +1,26 @@
+preprocessing:
+  target_col: price
+  min_year: 1920
+  max_year: 2017
+  max_power: 2301
+  test_size: 0.2
+  random_state: 42
+  drop_columns: [date_crawled, registration_month, date_created, number_of_pictures, postal_code, last_seen]
+  categorical_fill_values:
+    fuel_type: unknown
+    vehicle_type: unknown
+    repaired: "yes"
+
+training:
+  n_trials: 10
+  cv_folds: 3
+  random_state: 42
+  model_output_path: models/best_model_pipeline.joblib
+
+mlflow:
+  experiment_name: car_price_prediction_optuna
+
+paths:
+  raw_data: data/raw/autos.csv
+  models_dir: models
+  mlruns_dir: mlruns
