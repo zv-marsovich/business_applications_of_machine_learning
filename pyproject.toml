@@ -1,0 +1,22 @@
+[project]
+name = "business-applications-of-machine-learning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "catboost>=1.2.10",
+    "joblib>=1.6.0",
+    "lightgbm>=4.7.0",
+    "matplotlib==3.10.9",
+    "missingno>=0.5.2",
+    "mlflow>=3.18.0",
+    "numpy>=2.5.5",
+    "optuna==4.8.0",
+    "pandas>=3.1.1",
+    "phik==0.12.4",
+    "psutil>=7.2.2",
+    "pytest>=9.2.0",
+    "scikit-learn==1.7.2",
+    "xgboost>=3.4.1",
+]
