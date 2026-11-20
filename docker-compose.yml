@@ -2,16 +2,17 @@ services:
   train:
     build: .
     image: car-price-ml:latest
+    user: "${UID:-1000}:${GID:-1000}"
     command: scripts.train
     volumes:
       - ./data:/app/data:ro
       - ./models:/app/models
       - ./mlruns:/app/mlruns
-      - ./mlflow.db:/app/mlflow.db
     restart: "no"
 
   predict:
     image: car-price-ml:latest
+    user: "${UID:-1000}:${GID:-1000}"
     command: >
       scripts.predict
       --input /app/data/autos.csv
@@ -28,12 +29,12 @@ services:
     image: ghcr.io/mlflow/mlflow:v3.18.0
     command: >
       mlflow server
-      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --backend-store-uri file:///mlflow/mlruns
       --default-artifact-root file:///mlflow/mlruns
       --host 0.0.0.0
       --port 5000
     ports:
       - "5000:5000"
     volumes:
-      - ./mlflow.db:/mlflow/mlflow.db
       - ./mlruns:/mlflow/mlruns
+    restart: unless-stopped
