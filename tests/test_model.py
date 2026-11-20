@@ -3,8 +3,6 @@ import pandas as pd
 import pytest
 from src.models.metrics import evaluate_predictions, rmse
 
-# ---------- rmse ----------
-
 
 def test_rmse_positive() -> None:
     """RMSE на неидеальном предсказании: > 0 и тип float."""
@@ -43,9 +41,6 @@ def test_rmse_accepts_pandas_series() -> None:
     y_pred = pd.Series([1.0, 2.0, 4.0])
 
     assert rmse(y_true, y_pred) == pytest.approx(1.0 / (3**0.5))
-
-
-# ---------- evaluate_predictions ----------
 
 
 def test_evaluate_predictions_returns_all_metrics() -> None:

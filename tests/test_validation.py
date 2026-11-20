@@ -3,8 +3,6 @@ import pytest
 from src.config import PreprocessingConfig
 from src.data.validation import validate_clean_data, validate_raw_schema
 
-# ---------- validate_raw_schema ----------
-
 
 def test_validate_raw_schema_ok() -> None:
     df = pd.DataFrame(
@@ -40,9 +38,6 @@ def test_validate_raw_schema_missing_column(missing_col: str) -> None:
 
     with pytest.raises(ValueError, match="Отсутствуют обязательные колонки"):
         validate_raw_schema(df)
-
-
-# ---------- validate_clean_data ----------
 
 
 def test_validate_clean_data_ok() -> None:

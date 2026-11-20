@@ -17,7 +17,6 @@ dependencies = [
     "phik==0.12.4",
     "psutil>=7.2.2",
     "pydantic>=2",
-    "pytest>=9.2.0",
     "scikit-learn==1.7.2",
     "xgboost>=3.4.1",
 ]

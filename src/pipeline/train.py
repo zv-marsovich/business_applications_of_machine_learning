@@ -34,7 +34,7 @@ def train_pipeline(settings: Settings) -> dict[str, ModelResult]:
         cv_folds=settings.training.cv_folds,
     )
 
-    init_mlflow(settings.mlflow, mlruns_dir)
+    init_mlflow(settings.mlflow, settings.project_root)
     run_name = f"AutoML_{datetime.now():%Y%m%d_%H%M%S}"
 
     results: dict[str, ModelResult] = {}
@@ -57,7 +57,6 @@ def train_pipeline(settings: Settings) -> dict[str, ModelResult]:
                 spec, ctx, X_test, y_test, settings.training.n_trials
             )
 
-        # Логирование — внутри with (исправление бага исходника)
         for name, r in results.items():
             prefix = name.lower()
             mlflow.log_metrics(
@@ -76,7 +75,9 @@ def train_pipeline(settings: Settings) -> dict[str, ModelResult]:
         mlflow.log_metric("best_rmse_cv", best.cv_rmse)
 
         save_model(best.pipeline, output_path)
-        mlflow.sklearn.log_model(best.pipeline, artifact_path="best_model")
+        mlflow.sklearn.log_model(
+            best.pipeline, name="best_model", serialization_format="cloudpickle"
+        )
 
     logger.info(
         "Best model: %s (CV RMSE: %.3f) → %s", best_name, best.cv_rmse, output_path

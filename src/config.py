@@ -38,6 +38,7 @@ class TrainingConfig(BaseModel):
 class MLflowConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
     experiment_name: str = "car_price_prediction_optuna"
+    tracking_uri: str = "sqlite:///mlflow.db"
 
 
 class PathsConfig(BaseModel):

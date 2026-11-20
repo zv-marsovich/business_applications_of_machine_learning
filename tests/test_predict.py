@@ -43,9 +43,6 @@ def _fit_toy_pipeline(df: pd.DataFrame) -> Pipeline:
     return pipeline
 
 
-# ---------- normalize_columns ----------
-
-
 def test_normalize_columns_camel_case() -> None:
     df = pd.DataFrame({"VehicleType": ("sedan",), "RegistrationYear": (2010,)})
     out = normalize_columns(df)
@@ -58,42 +55,36 @@ def test_normalize_columns_idempotent() -> None:
     assert tuple(out.columns) == ("fuel_type",)
 
 
-# ---------- prepare_inference_features ----------
-
-
 def test_prepare_inference_features_keeps_all_rows() -> None:
     """Ключевое отличие от train: ни одна строка не удаляется."""
     cfg = PreprocessingConfig()
     df = pd.DataFrame(
         {
-            "model": ("golf", None, "astra"),  # одна модель = None
+            "model": ("golf", None, "astra"),
             "gearbox": ("manual", "auto", "auto"),
-            "power": (100, 0, 120),  # одна мощность = 0
-            "registration_year": (2010, 1900, 2012),  # один год вне диапазона
+            "power": (100, 0, 120),
+            "registration_year": (2010, 1900, 2012),
             "price": (5000, 6000, 7000),
             "fuel_type": ("petrol", "gasoline", None),
-            "postal_code": (1, 2, 3),  # служебная колонка
+            "postal_code": (1, 2, 3),
         }
     )
 
     result = prepare_inference_features(df, cfg)
 
-    assert len(result) == 3  # все строки на месте
-    assert "postal_code" not in result.columns  # служебные удалены
+    assert len(result) == 3
+    assert "postal_code" not in result.columns
     assert result["fuel_type"].tolist() == [
         "petrol",
         "petrol",
         "unknown",
-    ]  # gasoline→petrol, NaN→unknown
+    ]
 
 
 def test_prepare_inference_features_empty_raises() -> None:
     cfg = PreprocessingConfig()
     with pytest.raises(ValueError, match="пуст"):
         prepare_inference_features(pd.DataFrame(), cfg)
-
-
-# ---------- drop_target_if_present ----------
 
 
 def test_drop_target_if_present_yes() -> None:
@@ -111,9 +102,6 @@ def test_drop_target_if_present_no() -> None:
     assert actual is None
 
 
-# ---------- predict_batch ----------
-
-
 def test_predict_batch_preserves_index() -> None:
     """Индекс должен сохраниться — иначе нельзя сматчить с исходным входом."""
     df = _toy_df()
@@ -127,9 +115,6 @@ def test_predict_batch_preserves_index() -> None:
     assert preds.index.tolist() == [10, 20, 30, 40, 50, 60]
     assert preds.name == "predicted_price"
     assert not preds.isna().any()
-
-
-# ---------- predict_from_file (roundtrip) ----------
 
 
 def test_predict_from_file_roundtrip(tmp_path: Path) -> None:
@@ -193,3 +178,42 @@ def test_predict_from_file_missing_model(tmp_path: Path) -> None:
             model_path=tmp_path / "nope.joblib",
             config=PreprocessingConfig(),
         )
+
+
+def test_prepare_inference_features_fills_all_categorical_nans() -> None:
+    """NaN в ЛЮБОЙ категориальной колонке (не только из fill_values) → 'unknown'.
+
+    Регресс на баг: CatBoost падал на NaN в brand/gearbox при inference.
+    """
+    cfg = PreprocessingConfig()
+    df = pd.DataFrame(
+        {
+            "model": ("golf", "astra"),
+            "brand": ("vw", None),
+            "gearbox": (None, "auto"),
+            "fuel_type": (None, "diesel"),
+            "power": (100, 120),
+            "registration_year": (2010, 2012),
+        }
+    )
+
+    result = prepare_inference_features(df, cfg)
+
+    assert len(result) == 2
+    assert result["brand"].tolist() == ["vw", "unknown"]
+    assert result["gearbox"].tolist() == ["unknown", "auto"]
+    assert result["fuel_type"].tolist() == ["unknown", "diesel"]
+    assert not result.select_dtypes(include=["object", "string"]).isna().any().any()
+
+
+def test_predict_batch_clips_negative_predictions() -> None:
+    """Отрицательные предсказания клипаются в 0 — цена не бывает < 0."""
+    df = _toy_df()
+    pipeline = _fit_toy_pipeline(df)
+    features, _ = drop_target_if_present(df, "price")
+
+    features.loc[features.index[0], "registration_year"] = 1900
+    features.loc[features.index[0], "power"] = 0
+
+    preds = predict_batch(pipeline, features)
+    assert (preds >= 0).all()

@@ -27,7 +27,11 @@ def prepare_inference_features(
         raise ValueError("Входной DataFrame пуст")
 
     df = normalize_columns(df)
-    return standardize_categories(df, config)
+    df = standardize_categories(df, config)
+    cat_cols = df.select_dtypes(include=["object", "string", "category"]).columns
+    df[cat_cols] = df[cat_cols].fillna("unknown")
+
+    return df
 
 
 def drop_target_if_present(
@@ -42,6 +46,7 @@ def drop_target_if_present(
 def predict_batch(model: Pipeline, features: pd.DataFrame) -> pd.Series:
     """Predict с сохранением исходного индекса — чтобы сматчить с входом."""
     predictions = model.predict(features)
+    predictions = predictions.clip(min=0.0)
     return pd.Series(predictions, index=features.index, name="predicted_price")
 
 

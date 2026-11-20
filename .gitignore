@@ -18,3 +18,4 @@ catboost_info/
 # Другие возможные артефакты
 *.pkl
 *.joblib
+mlflow.db

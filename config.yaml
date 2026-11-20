@@ -19,8 +19,9 @@ training:
 
 mlflow:
   experiment_name: car_price_prediction_optuna
+  tracking_uri: sqlite:///mlflow.db
 
 paths:
-  raw_data: data/raw/autos.csv
+  raw_data: data/autos.csv
   models_dir: models
   mlruns_dir: mlruns
