@@ -51,6 +51,7 @@ business_applications_of_machine_learning/
 │   │   ├── metrics.py           # rmse, evaluate_predictions
 │   │   ├── persistence.py       # save_model, load_model
 │   │   ├── registry.py          # MODEL_REGISTRY (XGB/LGBM/CatBoost/LinReg)
+│   │   ├── selection.py         # выбор модели не только по метрикам но и по времени обучения
 │   │   └── trainer.py           # train_single_model
 │   ├── optimization/
 │   │   └── optimize.py          # make_objective, run_study
