@@ -172,16 +172,15 @@ uv run python scripts/predict.py \
 ## Мониторинг
 
 ```bash
-uv run mlflow ui
+uv run mlflow ui \
+  --backend-store-uri sqlite:///mlflow.db \
+  --default-artifact-root ./mlruns \
+  --serve-artifacts
 ```
 
 - **MLflow:** логирование метрик, параметров и артефактов
 - **Системные метрики:** CPU, RAM, диск (psutil)
 - **Время обучения:** замеряется для каждой модели
-
-![Диаграммы метрик в MLflow](mlflow_diagrams/diagram1.png)
-![Диаграммы метрик в MLflow](mlflow_diagrams/diagram2.png)
-![Диаграммы метрик в MLflow](mlflow_diagrams/diagram3.png)
 
 ## Docker
 
