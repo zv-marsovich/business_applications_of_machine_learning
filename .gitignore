@@ -19,3 +19,4 @@ catboost_info/
 *.pkl
 *.joblib
 mlflow.db
+preds.csv

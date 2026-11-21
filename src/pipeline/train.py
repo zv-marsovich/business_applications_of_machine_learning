@@ -7,6 +7,7 @@ from src.features.schema import get_columns_types
 from src.logging_config import get_logger
 from src.models.persistence import save_model
 from src.models.registry import MODEL_REGISTRY, TrainContext
+from src.models.selection import select_best_model
 from src.models.trainer import ModelResult, train_single_model
 from src.pipeline.prepare import prepare_training_dataset
 from src.tracking.mlflow_utils import init_mlflow, log_system_metrics
@@ -69,10 +70,16 @@ def train_pipeline(settings: Settings) -> dict[str, ModelResult]:
                 }
             )
 
-        best_name = min(results, key=lambda n: results[n].cv_rmse)
+        best_name = select_best_model(
+            results, tolerance=settings.training.selection_tolerance
+        )
+        best_by_rmse = min(results, key=lambda n: results[n].cv_rmse)
         best = results[best_name]
         mlflow.log_param("best_model", best_name)
+        mlflow.log_param("best_model_by_rmse_only", best_by_rmse)
+        mlflow.log_param("selection_tolerance", settings.training.selection_tolerance)
         mlflow.log_metric("best_rmse_cv", best.cv_rmse)
+        mlflow.log_metric("best_train_time", best.train_time)
 
         save_model(best.pipeline, output_path)
         mlflow.sklearn.log_model(

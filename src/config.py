@@ -33,6 +33,7 @@ class TrainingConfig(BaseModel):
     cv_folds: int = 3
     random_state: int = 42
     model_output_path: Path = Path("models/best_model_pipeline.joblib")
+    selection_tolerance: float = Field(0.03, ge=0.0, le=0.5)
 
 
 class MLflowConfig(BaseModel):

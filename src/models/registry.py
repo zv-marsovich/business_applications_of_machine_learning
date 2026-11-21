@@ -55,19 +55,25 @@ def _xgb_fixed(ctx: TrainContext) -> dict[str, Any]:
 
 def _lgbm_search(trial: optuna.Trial) -> dict[str, Any]:
     return {
-        "n_estimators": trial.suggest_int("n_estimators", 100, 500, step=100),
+        "n_estimators": trial.suggest_int("n_estimators", 200, 1500, step=100),
         "max_depth": trial.suggest_int("max_depth", 3, 12),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
-        "num_leaves": trial.suggest_int("num_leaves", 20, 100),
+        "learning_rate": trial.suggest_float("learning_rate", 0.005, 0.3, log=True),
+        "num_leaves": trial.suggest_int("num_leaves", 30, 100),
         "subsample": trial.suggest_float("subsample", 0.6, 1.0),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
         "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
         "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
+        "min_child_samples": trial.suggest_int("min_child_samples", 10, 200),
     }
 
 
 def _lgbm_fixed(ctx: TrainContext) -> dict[str, Any]:
-    return {"random_state": ctx.random_state, "verbose": -1}
+    return {
+        "random_state": ctx.random_state,
+        "verbose": -1,
+        "n_jobs": -1,
+        "bagging_freq": 1,
+    }
 
 
 def _cb_search(trial: optuna.Trial) -> dict[str, Any]:
@@ -86,6 +92,7 @@ def _cb_fixed(ctx: TrainContext) -> dict[str, Any]:
         "random_seed": ctx.random_state,
         "verbose": 0,
         "loss_function": "RMSE",
+        "thread_count": -1,
     }
 
 

@@ -16,6 +16,7 @@ training:
   cv_folds: 3
   random_state: 42
   model_output_path: models/best_model_pipeline.joblib
+  selection_tolerance: 0.03
 
 mlflow:
   experiment_name: car_price_prediction_optuna

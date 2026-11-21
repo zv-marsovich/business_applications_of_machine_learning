@@ -42,7 +42,7 @@ def cross_val_rmse(spec: ModelSpec, ctx: TrainContext, params: dict[str, Any]) -
         ctx.y_train,
         cv=ctx.cv_folds,
         scoring="neg_root_mean_squared_error",
-        n_jobs=-1,
+        n_jobs=1,
     )
     return float(-scores.mean())
 
